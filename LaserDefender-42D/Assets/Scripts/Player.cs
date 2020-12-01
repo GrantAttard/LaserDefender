@@ -10,8 +10,10 @@ public class Player : MonoBehaviour
     [SerializeField] float movementSpeed = 10f;
     [SerializeField] float projectileSpeed = 20f;
     [SerializeField] float projectileFiringTime = 0.3f;
+
     [SerializeField] GameObject laserPrefab;
-    [SerializeField] Coroutine fireRoutine;
+    Coroutine fireRoutine;
+
 
     float padding = 0.5f;
 
@@ -44,8 +46,8 @@ public class Player : MonoBehaviour
     {
         // print("The Start built-in method has been called!");
         SetUpMoveBoundaries();
-        /*StartCoroutine(PrintAndWait());
-        */
+
+       // StartCoroutine(PrintAndWait());
     }
 
     // Update is called once per frame
@@ -123,51 +125,57 @@ public class Player : MonoBehaviour
          * The method is executed ONLY once as soon as the button is pressed. To keep
          * executing, the user needs to keep tapping on the button.
          */
-        
 
         if (Input.GetButtonDown("Fire1")) // if(Input.GetButtonDown("Fire1")) == true)
         {
-            StartCoroutine(FireContinuously());
+            fireRoutine = StartCoroutine(FireContinously());
         }
 
         if (Input.GetButtonUp("Fire1"))
         {
             StopCoroutine(fireRoutine);
+            // if we don't stop the coroutine, new coroutines will be constantly created
         }
     }
 
-    /* IEnumerator PrintAndWait()
-     {
-         print("Message 1 Sent!");
-         yield return new WaitForSeconds(3f);
+    /*   IEnumerator PrintAndWait()
+       {
+           print("Message 1 sent!");
 
-         print("Message 2 sent!");
-     }
+           yield return new WaitForSeconds(3f);
+
+           print("Message 2 sent!");
+       }
     */
 
-    IEnumerator FireContinuously()
+    IEnumerator FireContinously()
     {
         while (true)
         {
             /* The Instantiate method creates (and returns) a clone from the object passed as the 
-                 * first parameter. The position passed as the 2nd parameter will indicate where
-                 * the clone needs to be placed in the scene.
-                 * Quaternion.identity represents no rotation given to the object.
-                 */
+             * first parameter. The position passed as the 2nd parameter will indicate where
+             * the clone needs to be placed in the scene.
+             * Quaternion.identity represents no rotation given to the object.
+             */
 
-            GameObject laserClone = Instantiate(laserPrefab, this.transform.position, Quaternion.identity);
+            GameObject laserClone = Instantiate(laserPrefab, this.transform.position,
+                Quaternion.identity);
 
+            // the velocity property is part of the rigidbody2D component
             laserClone.GetComponent<Rigidbody2D>().velocity = new Vector2(0, projectileSpeed);
-            /* We are using coroutines so that we create a short delay between the generation of
-             * one laser and another (since we are in an infinite loop).
-             * The advantage of using coroutines, is that during the delay, the method process will return
-             * and continue with other processes and get back to the method once the delay is up. If the method process
-             * does not return back, all of the application would be stuck until the method continues after the delay.
+
+            /*We are using coroutines so that we create a short delay between the generation
+             * of one laser and another (since we are in an infinite loop). The advantage
+             * of using coroutines, is that during the delay, the method process will return
+             * and continue with other processes and get back to the method once the delay
+             * is up. If the method process does not return back, all of the application
+             * would be stuck until the method continues after the delay.
              * 
-             * yield return is the keyword which indicates that the process needs to pause from this method execution, return and get back exactly
-             * where it left off.
-             * the time or the reason when to get back is indicated by new WaitForSeconds or new WaitUntil or new WaitWhile etc
-             * basically it's either a time delay or waiting for a condition to be met.
+             * yield return is the keyword which indicates that the process needs to pause
+             * from this method execution, return and get back exactly to where it left off.
+             * The time or the reason when to get back is indicated by new WaitForSeconds
+             * or new WaitUntil or new WaitWhile etc basically it's either a time delay or
+             * waiting for a condition to be met.
              */
             yield return new WaitForSeconds(projectileFiringTime);
         }
